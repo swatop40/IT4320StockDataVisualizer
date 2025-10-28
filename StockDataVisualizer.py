@@ -1,5 +1,6 @@
 import requests
 import json
+import pygal
 
 API_KEY = "0W8V2C7EF7NNQ07C"
 URL = "https://www.alphavantage.co/query"
@@ -36,6 +37,61 @@ def fetch_stock_data(symbol, function='TIME_SERIES_DAILY', start_date="", end_da
         print("Error: Unable to fetch data from Alpha Vantage.")
         return None
 
+def genBar(stock_data):
+    chart_data = {
+    "open": [],
+    "high": [],
+    "low": [],
+    "close": []
+    }
+
+
+    for time in sorted(stock_data):
+        chart_data["open"].append(float(stock_data[time]["1. open"]))
+        chart_data["high"].append(float(stock_data[time]["2. high"]))
+        chart_data["low"].append(float(stock_data[time]["3. low"]))
+        chart_data["close"].append(float(stock_data[time]["4. close"]))
+
+
+
+    BarChart = pygal.Bar()
+    BarChart.title = "Test"
+
+    for category, prices in chart_data.items():
+        BarChart.add(category, prices)
+
+    BarChart.render_to_file("test.svg")
+
+
+def genLine(stock_data):
+
+    chart_data = {
+    "open": [],
+    "high": [],
+    "low": [],
+    "close": []
+    }
+
+
+    for time in sorted(stock_data):
+        chart_data["open"].append(float(stock_data[time]["1. open"]))
+        chart_data["high"].append(float(stock_data[time]["2. high"]))
+        chart_data["low"].append(float(stock_data[time]["3. low"]))
+        chart_data["close"].append(float(stock_data[time]["4. close"]))
+
+
+
+    LineChart = pygal.Line()
+    LineChart.title = "Test"
+
+    for category, prices in chart_data.items():
+        LineChart.add(category, prices)
+
+    LineChart.render_to_file("test.svg")
+
+
+
+
 def main():
     symbol = input("Enter the Stock Symbol: ")
     
@@ -62,7 +118,18 @@ def main():
     
     if stock_data:
         print(f"Stock data for {symbol} retrieved successfully!")
-        print(stock_data)
+        while True:
+            chartType = input("Would you like your data in a Bar Graph or Line Graph?(enter 1 or 2 respectively) ")
+            if chartType == "1":
+                genBar(stock_data)
+                break
+            elif chartType =="2":
+                genLine(stock_data)
+                break
+            elif chartType != "1" or "2":
+                print("Please enter 1 to generate a Bar Graph or 2 to generate a Line Graph")
+
+
     else:
         print("Failed to retrieve stock data.")
 
